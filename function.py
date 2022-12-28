@@ -1,7 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-#bitch bitch bitch
+#blkdn'lksanf'lksakf
 class particle:
     """
     :param s: spin of the particle ,val- 1 or -1

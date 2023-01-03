@@ -3,16 +3,17 @@ import matplotlib.pyplot as plt
 
 #region - Assiting Functions
 def Calc_energy(lattice,i,j,eta,h):
-       p=lattice[i][j].s
-       p_right=lattice[(i+1)%len(lattice)][j].s
-       p_left=lattice[(i-1)%len(lattice)][j].s
-       p_down=lattice[i][(j-1)%len(lattice)].s
-       p_up=lattice[i][(j+1)%len(lattice)].s
+       latt=lattice.lattice
+       p=latt[i][j].s
+       p_right=latt[(i+1)%len(latt)][j].s
+       p_left=latt[(i-1)%len(latt)][j].s
+       p_down=latt[i][(j-1)%len(latt)].s
+       p_up=latt[i][(j+1)%len(latt)].s
        epsilon = -p*eta - h *p* (p_up + p_down + p_left + p_right)
        return epsilon
 def Choose_to_flip(lattice,i,j,eta,h):
     confirm=0
-    epsilon=Calc_energy(lattice,i,j,mu,B,J)
+    epsilon=Calc_energy(lattice,i,j,eta,h)
     P=1/(1+np.exp(-2*epsilon)) #assuming Tkb=1
     tmp=np.random.binomial(1,P)
     if tmp==1:
@@ -21,14 +22,16 @@ def Choose_to_flip(lattice,i,j,eta,h):
     return lattice , confirm
 def Calc_net_magenetization(lattice):
     M=0
-    for i in range(len(lattice)):
-        for j in range(len(lattice)):
-            M+=lattice[i][j].s
+    latt=lattice.lattice
+    for i in range(len(latt)):
+        for j in range(len(latt)):
+            M+=latt[i][j].s
     return M
-def Calc_net_energy(lattice):
+def Calc_net_energy(lattice,eta,h):
     E=0
-    for i in range(len(lattice)):
-        for j in range(len(lattice)):
+    latt=lattice.lattice
+    for i in range(len(latt)):
+        for j in range(len(latt)):
             E+=Calc_energy(lattice,i,j,eta,h)
     return E
 def Calc_specific_heat(U_mean_tot,U_mean_sq_tot,n):
@@ -70,13 +73,13 @@ class lattice:
         self.E=E
         self.M=M
         return
-    def Update(self):
+    def Update(self,eta,h):
         """
         Updates the net energy and magnetization of the lattice
         :return: M total magnetization of the lattice , E total energy of the lattice
         """
-        self.M=Calc_net_magenetization(self.lattice)
-        self.E=Calc_net_energy(self.lattice)
+        self.M=Calc_net_magenetization(self)
+        self.E=Calc_net_energy(self,eta,h)
         return self.M,self.E
     def Scatter(self):
         """
@@ -86,7 +89,6 @@ class lattice:
         for i in range(self.n):
             for j in range(self.n):
                 self.lattice[i][j] = particle(np.random.randint(2)*2-1)
-        self.Update()
         return self.lattice
     def flip(self,i,j):
         """
@@ -101,12 +103,16 @@ class lattice:
 #endregion
 
 #region - Main
-def Simulate_spin_resrviour(n,eta,h,nsweep,Kinit,limit):
+def Simulate_spin_resrviour(n,eta,h,nsweep,Kinit,delta):
 
-    delta=limit+1
+
+    delta_M= delta + 1
+
     latt=lattice(n)
     latt.Scatter()
-    latt.Update()
+    latt.Update(eta,h)
+
+
     U_sum_tot=0
     U_sum_sq_tot=0
     M_sum_tot=0
@@ -114,7 +120,7 @@ def Simulate_spin_resrviour(n,eta,h,nsweep,Kinit,limit):
     flips=0
     sweep_cnt=0
     K=Kinit
-    mean_M_half=0
+    mean_M_half=1
     mean_M=0
     mean_M_s=0
     mean_U=0
@@ -124,23 +130,22 @@ def Simulate_spin_resrviour(n,eta,h,nsweep,Kinit,limit):
 
 
 
-    while delta>limit:
+    while delta_M>delta:
 
-        if K == 10**8:
+        if K > 10**8:
             print("This is too long for me, I quit!!!")
             break
         latt,flipstmp= Sweep(latt,eta,h)
         flips+=flipstmp
         sweep_cnt+=1
-
         if sweep_cnt%nsweep==0:
-            latt.update()
+            latt.Update(eta,h)
             U_sum_tot+=latt.E
             U_sum_sq_tot+=latt.E**2
             M_sum_tot+=latt.M
             M_sum_sq_tot+=latt.M**2
 
-        if Kinit<=flips and clr==0:
+        if (Kinit/2)<=flips and clr==0:
             U_sum_tot=0
             U_sum_sq_tot=0
             M_sum_tot=0
@@ -150,14 +155,15 @@ def Simulate_spin_resrviour(n,eta,h,nsweep,Kinit,limit):
             flips=0
             clr=1
 
-        if   K<=flips:
+        if   K <= flips:
             nsample=sweep_cnt/nsweep
             mean_M=M_sum_tot/nsample
             mean_M_s=M_sum_sq_tot/nsample
             mean_U=U_sum_tot/nsample
             mean_U_s=U_sum_sq_tot/nsample
-            cv = Calc_specific_heat(mean_U, mea_U_s,lattice.n)
-            delta=abs(mean_M-mean_M_half)/abs(mean_M_half)
+            cv = Calc_specific_heat(mean_U, mean_U_s,latt.n)
+            delta_M=np.array(abs(mean_M-mean_M_half))/np.array(abs(mean_M))
+            # delta=delta[0]
             U_sum_tot = 0
             U_sum_sq_tot = 0
             M_sum_tot = 0
@@ -170,21 +176,20 @@ def Simulate_spin_resrviour(n,eta,h,nsweep,Kinit,limit):
 
     return mean_M,mean_M_s,mean_U,mean_U_s,cv
 #endregion
-#hi yoav
 
 
 
 #example of how to use the class
-latt=lattice(n)
-latt.Scatter()
-latt2=lattice(n)
-latt2.Scatter()
-w=latt.lattice[1][1].s
-y=latt2.lattice[1][1].s
-print(w,y)
-a=latt.lattice[1][1].flip()
-b=latt2.flip(1,1)
-print(a,b[1][1].s)
+# latt=lattice(n)
+# latt.Scatter()
+# latt2=lattice(n)
+# latt2.Scatter()
+# w=latt.lattice[1][1].s
+# y=latt2.lattice[1][1].s
+# print(w,y)
+# a=latt.lattice[1][1].flip()
+# b=latt2.flip(1,1)
+# print(a,b[1][1].s)
 
 
 

@@ -131,6 +131,7 @@ def Simulate_spin_resrviour(n,eta,h,nsweep,Kinit,delta):
 
 
     while delta_M>delta:
+        # print('K is:',K)
 
         if K > 10**8:
             print("This is too long for me, I quit!!!")
@@ -138,7 +139,7 @@ def Simulate_spin_resrviour(n,eta,h,nsweep,Kinit,delta):
         latt,flipstmp= Sweep(latt,eta,h)
         flips+=flipstmp
         sweep_cnt+=1
-        if sweep_cnt%nsweep==0:
+        if sweep_cnt%nsweep==0 or sweep_cnt==1:
             latt.Update(eta,h)
             U_sum_tot+=latt.E
             U_sum_sq_tot+=latt.E**2
@@ -146,6 +147,7 @@ def Simulate_spin_resrviour(n,eta,h,nsweep,Kinit,delta):
             M_sum_sq_tot+=latt.M**2
 
         if (Kinit/2)<=flips and clr==0:
+            print('halfway')
             U_sum_tot=0
             U_sum_sq_tot=0
             M_sum_tot=0
@@ -155,7 +157,7 @@ def Simulate_spin_resrviour(n,eta,h,nsweep,Kinit,delta):
             flips=0
             clr=1
 
-        if   K <= flips:
+        if   K <= flips and clr==1:
             nsample=sweep_cnt/nsweep
             mean_M=M_sum_tot/nsample
             mean_M_s=M_sum_sq_tot/nsample
@@ -177,6 +179,8 @@ def Simulate_spin_resrviour(n,eta,h,nsweep,Kinit,delta):
     return mean_M,mean_M_s,mean_U,mean_U_s,cv
 #endregion
 
+M,M_s,U,U_s,cv=Simulate_spin_resrviour(32,0.1,-1,5,10000,0.001)
+print(M,M_s,U,U_s,cv)
 
 
 #example of how to use the class
@@ -192,4 +196,13 @@ def Simulate_spin_resrviour(n,eta,h,nsweep,Kinit,delta):
 # print(a,b[1][1].s)
 
 
-
+#example for saving the data
+# with open(data_path+"name"+'.txt', 'wt') as file:
+#          json.dump(data_dict_for_save),file,indent=4)
+#data_dict_for_save={}
+#l=[m]
+#data_dict_for_save['M']=M
+#data_dict_for_save['M_s']=M_s
+# with open(data_path + "name" + '.txt', 'rt') as file:
+#     data_1000_a = json.load(file)
+#M= data_1000_a['M']

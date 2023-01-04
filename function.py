@@ -1,5 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
+import time
 
 #region - Assiting Functions
 def Calc_energy(lattice,i,j,eta,h):
@@ -9,7 +10,7 @@ def Calc_energy(lattice,i,j,eta,h):
        p_left=latt[(i-1)%len(latt)][j].s
        p_down=latt[i][(j-1)%len(latt)].s
        p_up=latt[i][(j+1)%len(latt)].s
-       epsilon = -p*eta - h *p* (p_up + p_down + p_left + p_right)
+       epsilon = -p*h - eta *p* (p_up + p_down + p_left + p_right)
        return epsilon
 def Choose_to_flip(lattice,i,j,eta,h):
     confirm=0
@@ -25,7 +26,7 @@ def Calc_net_magenetization(lattice):
     latt=lattice.lattice
     for i in range(len(latt)):
         for j in range(len(latt)):
-            M+=latt[i][j].s
+            M += latt[i][j].s
     return M
 def Calc_net_energy(lattice,eta,h):
     E=0
@@ -35,7 +36,8 @@ def Calc_net_energy(lattice,eta,h):
             E+=Calc_energy(lattice,i,j,eta,h)
     return E
 def Calc_specific_heat(U_mean_tot,U_mean_sq_tot,n):
-    cv=(1/n**2)*(U_mean_sq_tot-(U_mean_tot**2))
+    kB=1
+    cv=(1/n**2)*kB*(U_mean_sq_tot-(U_mean_tot**2))
     return cv
 def Sweep(lattice,eta,h):
     flips=0
@@ -128,12 +130,15 @@ def Simulate_spin_resrviour(n,eta,h,nsweep,Kinit,delta):
 
     clr=0
 
-
+    tic=time.time()
+    toc=time.time()
+    ttt=0
 
     while delta_M>delta:
         # print('K is:',K)
 
         if K > 10**8:
+            print('we got to',delta_M, '||', delta)
             print("This is too long for me, I quit!!!")
             break
         latt,flipstmp= Sweep(latt,eta,h)
@@ -147,7 +152,7 @@ def Simulate_spin_resrviour(n,eta,h,nsweep,Kinit,delta):
             M_sum_sq_tot+=latt.M**2
 
         if (Kinit/2)<=flips and clr==0:
-            print('halfway')
+            print('Clearing the system')
             U_sum_tot=0
             U_sum_sq_tot=0
             M_sum_tot=0
@@ -158,20 +163,32 @@ def Simulate_spin_resrviour(n,eta,h,nsweep,Kinit,delta):
             clr=1
 
         if   K <= flips and clr==1:
-            nsample=sweep_cnt/nsweep
+
+#clock
+            ttt = toc - tic
+            print('run time:', "{:.2f}".format(ttt), 's, so far.')
+
+##checks for the code:
+            # print(delta_M,'||',delta)
+            # print(K , '||', flips)
+
+            nsample=(sweep_cnt/nsweep)+1
             mean_M=M_sum_tot/nsample
             mean_M_s=M_sum_sq_tot/nsample
             mean_U=U_sum_tot/nsample
             mean_U_s=U_sum_sq_tot/nsample
             cv = Calc_specific_heat(mean_U, mean_U_s,latt.n)
+
             delta_M=np.array(abs(mean_M-mean_M_half))/np.array(abs(mean_M))
-            # delta=delta[0]
+
+
             U_sum_tot = 0
             U_sum_sq_tot = 0
             M_sum_tot = 0
             M_sum_sq_tot = 0
             sweep_cnt = 0
             K = 2*K
+            toc=time.time()
             flips = 0
             mean_M_half=mean_M
 
@@ -179,8 +196,20 @@ def Simulate_spin_resrviour(n,eta,h,nsweep,Kinit,delta):
     return mean_M,mean_M_s,mean_U,mean_U_s,cv
 #endregion
 
-M,M_s,U,U_s,cv=Simulate_spin_resrviour(32,0.1,-1,5,10000,0.001)
-print(M,M_s,U,U_s,cv)
+#put this before the main
+t_start=time.time()
+#put the main here
+M,M_s,U,U_s,cv=Simulate_spin_resrviour(32,0.5,1,5,10000,0.001)
+#put this after the main
+t_end=time.time()
+if 1<((t_end-t_start)/60)<=60:
+ print('total time ran:',"{:.2f}".format((t_end-t_start)/60),'min')
+elif ((t_end-t_start)/60)>60:
+ print('total time ran:',"{:.2f}".format((t_end-t_start)/60/60),'hours')
+else:
+    print('total time ran:',"{:.2f}".format(t_end-t_start),'sec')
+# print(M,M_s,U,U_s,cv)
+
 
 
 #example of how to use the class

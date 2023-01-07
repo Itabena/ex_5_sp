@@ -9,7 +9,7 @@ result_path='C:\\Users\\ita-no\\My Drive\\BCs Physics\\3rd year\\Introduction to
 data_path='C:\\Users\\ita-no\\My Drive\\BCs Physics\\3rd year\\Introduction to statistical physics\\Numerical ex\\ex4\\data\\'
 #endregion
 # region -Importiong simulated data
-h=[0,0.1,0.5,1.0]
+h=[0,0.1,0.5,1]
 #region - h=0.1
 M_h_01=[]
 M_s_h_01=[]
@@ -20,12 +20,12 @@ eta_h_01=[]
 for i in [0.30,0.55,0.75]:
   with open(data_path+'h= '+str(h[1])+'_field_eta_vs_data_until_'+ "{:.2f}".format(i)+'.txt','rt') as file:
      tmp_dict=json.load(file)
-M_h_01.extend(tmp_dict["M"])
-M_s_h_01.extend(tmp_dict["Ms"])
-U_h_01.extend(tmp_dict["U"])
-U_s_h_01.extend(tmp_dict["Us"])
-cv_h_01.extend(tmp_dict["Cv"])
-eta_h_01.extend(tmp_dict["eta"])
+  M_h_01.extend(tmp_dict["M"])
+  M_s_h_01.extend(tmp_dict["Ms"])
+  U_h_01.extend(tmp_dict["U"])
+  U_s_h_01.extend(tmp_dict["Us"])
+  cv_h_01.extend(tmp_dict["Cv"])
+  eta_h_01.extend(tmp_dict["eta"])
 #endregion
 tmp_dict={}
 #region - h=0.5
@@ -38,12 +38,12 @@ eta_h_05=[]
 for i in [0.30,0.55,0.75]:
   with open(data_path+'h= '+str(h[2])+'_field_eta_vs_data_until_'+ "{:.2f}".format(i)+'.txt','rt') as file:
      tmp_dict=json.load(file)
-M_h_05.extend(tmp_dict["M"])
-M_s_h_05.extend(tmp_dict["Ms"])
-U_h_05.extend(tmp_dict["U"])
-U_s_h_05.extend(tmp_dict["Us"])
-cv_h_05.extend(tmp_dict["Cv"])
-eta_h_05.extend(tmp_dict["eta"])
+  M_h_05.extend(tmp_dict["M"])
+  M_s_h_05.extend(tmp_dict["Ms"])
+  U_h_05.extend(tmp_dict["U"])
+  U_s_h_05.extend(tmp_dict["Us"])
+  cv_h_05.extend(tmp_dict["Cv"])
+  eta_h_05.extend(tmp_dict["eta"])
 #endregion
 tmp_dict={}
 #region - h=1.0
@@ -56,12 +56,12 @@ eta_h_10=[]
 for i in [0.30,0.55,0.75]:
   with open(data_path+'h= '+str(h[3])+'_field_eta_vs_data_until_'+ "{:.2f}".format(i)+'.txt','rt') as file:
      tmp_dict=json.load(file)
-M_h_10.extend(tmp_dict["M"])
-M_s_h_10.extend(tmp_dict["Ms"])
-U_h_10.extend(tmp_dict["U"])
-U_s_h_10.extend(tmp_dict["Us"])
-cv_h_10.extend(tmp_dict["Cv"])
-eta_h_10.extend(tmp_dict["eta"])
+  M_h_10.extend(tmp_dict["M"])
+  M_s_h_10.extend(tmp_dict["Ms"])
+  U_h_10.extend(tmp_dict["U"])
+  U_s_h_10.extend(tmp_dict["Us"])
+  cv_h_10.extend(tmp_dict["Cv"])
+  eta_h_10.extend(tmp_dict["eta"])
 #endregion
 tmp_dict={}
 #region - h=0
@@ -74,12 +74,12 @@ eta_h_0=[]
 for i in [0.30,0.55,0.80]:
   with open(data_path+'h= '+str(h[0])+'_field_eta_vs_data_until_'+ "{:.2f}".format(i)+'.txt','rt') as file:
      tmp_dict=json.load(file)
-M_h_0.extend(tmp_dict["M"])
-M_s_h_0.extend(tmp_dict["Ms"])
-U_h_0.extend(tmp_dict["U"])
-U_s_h_0.extend(tmp_dict["Us"])
-cv_h_0.extend(tmp_dict["Cv"])
-eta_h_0.extend(tmp_dict["eta"])
+  M_h_0.extend(tmp_dict["M"])
+  M_s_h_0.extend(tmp_dict["Ms"])
+  U_h_0.extend(tmp_dict["U"])
+  U_s_h_0.extend(tmp_dict["Us"])
+  cv_h_0.extend(tmp_dict["Cv"])
+  eta_h_0.extend(tmp_dict["eta"])
 #endregion
 tmp_dict={}
 #region - h=0,Around critiacl
@@ -92,12 +92,12 @@ eta_h_0_HR=[]
 for i in [0.44,0.47]:
   with open(data_path+'h= '+str(h[0])+'_field_eta_vs_data_until_HR_'+ "{:.2f}".format(i)+'.txt','rt') as file:
      tmp_dict=json.load(file)
-M_h_0_HR.extend(tmp_dict["M"])
-M_s_h_0_HR.extend(tmp_dict["Ms"])
-U_h_0_HR.extend(tmp_dict["U"])
-U_s_h_0_HR.extend(tmp_dict["Us"])
-cv_h_0_HR.extend(tmp_dict["Cv"])
-eta_h_0_HR.extend(tmp_dict["eta"])
+  M_h_0_HR.extend(tmp_dict["M"])
+  M_s_h_0_HR.extend(tmp_dict["Ms"])
+  U_h_0_HR.extend(tmp_dict["U"])
+  U_s_h_0_HR.extend(tmp_dict["Us"])
+  cv_h_0_HR.extend(tmp_dict["Cv"])
+  eta_h_0_HR.extend(tmp_dict["eta"])
 #endregion
 #endregion
 #region - Other important variables
@@ -120,7 +120,7 @@ def Plot_Data(x,y,save_dir=' ',save_fig=0,new_fig=0,log=0):
        plt.figure()
     print('The lagand of the ploted data: ')
     plot_name=input()
-    plt.plt(x,y,'*',label=plot_name)
+    plt.plot(x,y,'*',label=plot_name)
     if log==1:
         plt.yscale('log')
         plt.xscale('log')
@@ -155,5 +155,10 @@ def Onsager(eta_min,eta_max,num_res):
 
 #endregion
  #region - Creating the final results
-
+# x=np.arange(1,10,0.1)
+# y=x**2
+eta_h_0.extend(eta_h_0_HR)
+M_h_0.extend(M_h_0_HR)
+Plot_Data(eta_h_0,abs(np.divide(M_h_0,N)),save_dir='C:\\Users\\user\\Desktop\\',save_fig=1,new_fig=0,log=0)
+plt.show()
 #endregion

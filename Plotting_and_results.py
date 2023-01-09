@@ -159,6 +159,6 @@ def Onsager(eta_min,eta_max,num_res):
 # y=x**2
 eta_h_0.extend(eta_h_0_HR)
 M_h_0.extend(M_h_0_HR)
-Plot_Data(eta_h_0,abs(np.divide(M_h_0,N)),save_dir='C:\\Users\\user\\Desktop\\',save_fig=1,new_fig=0,log=0)
+Plot_Data(eta_h_0,abs(np.divide(M_h_0,N)),save_dir='C:\\Users\\user\\Desktop\\',save_fig=1,new_fig=0,log=1)
 plt.show()
 #endregion

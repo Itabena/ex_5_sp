@@ -195,6 +195,7 @@ def Simulate_spin_resrviour(n,eta,h,nsweep,Kinit,delta):
             delta_M=np.array(abs(mean_M-mean_M_half))/np.array(abs(mean_M))
 
 
+            f=flips()
             U_sum_tot = 0
             U_sum_sq_tot = 0
             M_sum_tot = 0
@@ -206,61 +207,69 @@ def Simulate_spin_resrviour(n,eta,h,nsweep,Kinit,delta):
             mean_M_half=mean_M
 
 
-    return mean_M,mean_M_s,mean_U,mean_U_s,cv
+    return mean_M,mean_M_s,mean_U,mean_U_s,cv,f,sweep_cnt
 #endregion
 #
 #
 # #region- Main
-# #put this before the main
-# t_start=time.time()
-# #put the main here
-# eta2=np.arange(0.1,0.85,0.05)
-# eta1=np.arange(0.42,0.465,0.005)
-# eta3=np.arange(0.46,0.8,0.05)
-#
+#put this before the main
+t_start=time.time()
+#put the main here
+eta1=np.arange(0.1,0.85,0.05)
+eta2=np.arange(0.42,0.465,0.005)
+eta3=np.arange(0.46,0.8,0.05)
+
 # M_list=[]
 # M_s_list=[]
 # U_list=[]
 # U_s_list=[]
-# cv_list=[]
-# # Open a file to write the results to
-# save_dict=dict()
-#
-# # with open('results.txt', 'w') as f:
-# # Iterate over the values of eta1
-# print('Starting')
-# for h in [0]:
-#  cnt=0
-#  for i in range(0,len(eta1)):
-#         cnt+=1
-#         # Run the simulation and save the results
-#         tik=time.time()
-#         M,M_s,U,U_s,cv=Simulate_spin_resrviour(32, eta1[i], h, 5, 10000, 10**(-3))
-#         tok=time.time()
-#         Timer(tik,tok)
-#         print('Eta value:',"{:.2f}".format(eta1[i]),'M is: ',"{:.1f}".format(M),'simulation time was',)
-#         M_list.append(M)
-#         M_s_list.append(M_s)
-#         U_list.append(U)
-#         U_s_list.append(U_s)
-#         cv_list.append(cv)
-#         if cnt%5 == 0 or i==len(eta1)-1:
-#             save_dict['M']=M_list
-#             save_dict['Ms'] = M_s_list
-#             save_dict['U'] = U_list
-#             save_dict['Us'] = U_s_list
-#             save_dict['Cv'] = cv_list
-#             save_dict['eta'] = eta1[cnt-5:cnt].tolist()
-#             with open(data_path +'h= '+str(h)+'_field_eta_vs_data_until_HR_'+ "{:.2f}".format(eta1[i])+'.txt','wt') as file:
-#                json.dump(save_dict,file,indent=4)
-#             save_dict.clear()
-#             M_list=[]
-#             M_s_list=[]
-#             U_list=[]
-#             U_s_list=[]
-#             cv_list=[]
-#         # Write the results to the file
-#         # f.write(f"{M}, {M_s}, {U}, {U_s}, {cv}\n")
+# # cv_list=[]
+f_list=[]
+sweep_list=[]
+# Open a file to write the results to
+save_dict=dict()
+
+# with open('results.txt', 'w') as f:
+# Iterate over the values of eta1
+print('Starting')
+for h in [0]:
+ cnt=0
+ for i in range(0,len(eta1)):
+        cnt+=1
+        # Run the simulation and save the results
+        tik=time.time()
+        M,M_s,U,U_s,cv,f,s=Simulate_spin_resrviour(32, eta1[i], h, 5, 10000, 10**(-3))
+        tok=time.time()
+        Timer(tik,tok)
+        print('Eta value:',"{:.2f}".format(eta1[i]),'M is: ',"{:.1f}".format(M),'simulation time was',)
+        # M_list.append(M)
+        # M_s_list.append(M_s)
+        # U_list.append(U)
+        # U_s_list.append(U_s)
+        # cv_list.append(cv)
+        f_list.append(f)
+        sweep_list.append(s)
+        if cnt%5 == 0 or i==len(eta1)-1:
+            # save_dict['M']=M_list
+            # save_dict['Ms'] = M_s_list
+            # save_dict['U'] = U_list
+            # save_dict['Us'] = U_s_list
+            # save_dict['Cv'] = cv_list
+            # save_dict['eta'] = eta1[cnt-5:cnt].tolist()
+            save_dict['f'] = f_list
+            save_dict['s'] = sweep_list
+            with open(data_path +'h= '+str(h)+'_field_eta_vs_data_until_FL_'+ "{:.2f}".format(eta1[i])+'.txt','wt') as file:
+               json.dump(save_dict,file,indent=4)
+            save_dict.clear()
+            # M_list=[]
+            # M_s_list=[]
+            # U_list=[]
+            # U_s_list=[]
+            # cv_list=[]
+            f_list=[]
+            sweep_list=[]
+        # Write the results to the file
+        # f.write(f"{M}, {M_s}, {U}, {U_s}, {cv}\n")
 #
 # #
 # #     # Iterate over the values of eta2
